@@ -1,22 +1,22 @@
 const router = require('express').Router();
-const { body } = require('express-validator');
+const { param } = require('express-validator');
 const { errorWrap, HttpErrors } = require('../../helpers/errors');
 const validation = require('../../helpers/validation');
 const models = require('../../models');
 
 router.delete(
     '/task/:uuid',
-    validation([body('uuid').isUUID(4)]),
+    validation([param('uuid').isUUID(4)]),
     errorWrap(async (req, res) => {
         const { uuid } = req.params;
-        const task = await models.task.findByPk(uuid);
+        const task = await models.Task.findByPk(uuid);
 
         if (!task) {
-            throw HttpErrors.NotFound('task not found');
+            throw HttpErrors.NotFound('Task not found');
         }
         await task.destroy();
 
-        res.status(204).json('Task deleted successfully');
+        res.sendStatus(204);
     })
 );
 

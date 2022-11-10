@@ -4,27 +4,9 @@ const { taskMock } = require('./mock/task');
 const models = require('../models');
 const { v4: uuidV4 } = require('uuid');
 
-const getTasks = async () => {
-    const tasks = await models.Task.findAll();
-    return tasks;
-};
-
 describe('task', () => {
-    beforeAll(async () => {
-        tasks = getTasks();
-    });
-
     beforeEach(() => {
         jest.setTimeout(60000);
-    });
-
-    test('get task', async () => {
-        return request(app)
-            .get('/tasks')
-            .then((res) => {
-                expect(res.statusCode).toBe(200);
-                // expect(res.body).toEqual(expect.arrayContaining(tasks));
-            });
     });
 
     describe('create task', () => {
@@ -62,6 +44,57 @@ describe('task', () => {
         });
     });
 
+    describe('get task', () => {
+        describe('find many', () => {
+            test('find all tasks', async () => {
+                const tasks = await models.Task.findAll({
+                    raw: true,
+                });
+
+                return request(app)
+                    .get('/tasks')
+                    .then((res) => {
+                        expect(res.statusCode).toBe(200);
+                    });
+            });
+        });
+
+        describe('find one', () => {
+            test('find one by id', async () => {
+                const task = await models.Task.findOne();
+
+                return request(app)
+                    .get(`/task/${task.uuid}`)
+                    .then((res) => {
+                        expect(res.statusCode).toBe(200);
+                        expect(res.body).toEqual(task);
+                    });
+            });
+
+            test('find one with error: Not found', async () => {
+                const uuid = uuidV4();
+                return request(app)
+                    .get(`/task/${uuid}`)
+                    .then((res) => {
+                        expect(res.statusCode).toBe(404);
+                        expect(res.body.message).toEqual('Task not found');
+                    });
+            });
+
+            test('find one with error: Bad Request', async () => {
+                const uuid = uuidV4() + '4577';
+                return request(app)
+                    .get(`/task/${uuid}`)
+                    .then((res) => {
+                        expect(res.statusCode).toBe(403);
+                        expect(res.body.message).toEqual(
+                            `Invalid value uuid in params - ${uuid}`
+                        );
+                    });
+            });
+        });
+    });
+
     describe('should update task', () => {
         beforeEach(() => {
             jest.setTimeout(60000);
@@ -69,16 +102,18 @@ describe('task', () => {
 
         test('update:success', async () => {
             const payload = { isDone: true };
-            const tasks = await models.Task.findAll();
-
-            const result = { ...tasks[0], ...payload };
+            const task = await models.Task.findOne();
             return request(app)
-                .patch(`/task/${tasks[0].uuid}`)
+                .patch(`/task/${task.uuid}`)
                 .send(payload)
                 .set('Accept', 'application/json')
                 .then((res) => {
                     expect(res.statusCode).toBe(200);
-                    expect(res.body).toEqual(result);
+                    models.Task.findByPk(res.body.uuid, { raw: true }).then(
+                        (data) => {
+                            expect(res.body).toEqual(data);
+                        }
+                    );
                 });
         });
 
@@ -101,15 +136,39 @@ describe('task', () => {
             jest.setTimeout(60000);
         });
 
-        test('delete task', async () => {
-            const tasks = await models.Task.findAll();
+        test('delete task: success', async () => {
+            const task = await models.Task.findOne();
 
             return request(app)
-                .delete(`/task/${tasks[0].uuid}`)
+                .delete(`/task/${task.uuid}`)
                 .set('Accept', 'application/json')
                 .then((res) => {
                     expect(res.statusCode).toBe(204);
-                    expect(res.body).toBe('Task deleted successfully');
+                });
+        });
+
+        test('delete task with error: Not found', async () => {
+            const uuid = uuidV4();
+
+            return request(app)
+                .delete(`/task/${uuid}`)
+                .set('Accept', 'application/json')
+                .then((res) => {
+                    expect(res.statusCode).toBe(404);
+                    expect(res.body.message).toEqual('Task not found');
+                });
+        });
+
+        test('delete task with error: Bad Request', async () => {
+            const uuid = uuidV4() + '4578';
+
+            return request(app)
+                .delete(`/task/${uuid}`)
+                .then((res) => {
+                    expect(res.statusCode).toBe(403);
+                    expect(res.body.message).toEqual(
+                        `Invalid value uuid in params - ${uuid}`
+                    );
                 });
         });
     });
