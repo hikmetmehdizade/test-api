@@ -1,19 +1,19 @@
-const { param } = require('express-validator')
-const { errorWrap, HttpErrors } = require('../../helpers/errors')
-const { Task } = require('../../models')
-const router = require('express').Router()
-const validation = require('../../helpers/validation')
+const { param } = require('express-validator');
+const { errorWrap, HttpErrors } = require('../../helpers/errors');
+const { Task } = require('../../models');
+const router = require('express').Router();
+const validation = require('../../helpers/validation');
 
 router.get(
     '/task/:uuid',
     validation([param('uuid')]),
     errorWrap(async (req, res) => {
-        const { uuid } = req.params
+        const { uuid } = req.params;
 
-        const task = await Task.findByPk(uuid)
+        const task = await Task.findByPk(uuid);
 
-        res.status(200).json(task)
+        res.status(200).json(task);
     })
-)
+);
 
-module.exports = router
+module.exports = router;
