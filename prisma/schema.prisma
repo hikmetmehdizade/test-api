@@ -12,11 +12,34 @@ datasource db {
 }
 
 model Task {
-  uuid      String   @id @default(uuid())
-  title     String   @db.VarChar(255)
-  isDone    Boolean  @default(false) @map("is_done")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  uuid        String   @id @default(uuid())
+  title       String   @db.VarChar(255)
+  isDone      Boolean  @default(false) @map("is_done")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdBy   User     @relation(fields: [createdById], references: [uuid])
+  createdById String   @map("created_by_id")
 
   @@map("tasks")
+}
+
+model User {
+  uuid      String   @id @default(uuid())
+  email     String   @unique
+  firstName String   @map("first_name")
+  lastName  String   @map("last_name")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  tasks     Task[]
+
+  @@map("users")
+}
+
+model UserIdentity {
+  uuid         String  @id @default(uuid())
+  email        String  @unique
+  password     String
+  refreshToken String?
+
+  @@map("users_identity")
 }

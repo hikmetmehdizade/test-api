@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 export { prisma };
 
+
 app.listen(PORT, () => {
     console.log(`Server started: ${PORT}`);
 });
