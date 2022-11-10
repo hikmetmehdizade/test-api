@@ -1,33 +1,23 @@
-const router = require("express").Router();
-const fs = require("fs");
-const { body, validationResult } = require("express-validator");
-const { errorWrap, HttpErrors } = require("../../helpers/errors");
+const router = require('express').Router()
+const { body } = require('express-validator')
+const { errorWrap, HttpErrors } = require('../../helpers/errors')
+const validation = require('../../helpers/validation')
+const models = require('../../models')
 
 router.delete(
-  "/task/:uuid",
-  body("uuid").isUUID(4),
-  errorWrap(async (req, res) => {
-    validationResult(req).throw();
+    '/task/:uuid',
+    validation([body('uuid').isUUID(4)]),
+    errorWrap(async (req, res) => {
+        const { uuid } = req.params
+        const task = await models.task.findByPk(uuid)
 
-    const { uuid } = req.params;
-    const data = fs.readFileSync(`${global.appRoot}/data/tasks.json`, "utf8");
-    const tasks = JSON.parse(data);
+        if (!task) {
+            throw HttpErrors.NotFound('task not found')
+        }
+        await task.destroy()
 
-    const foundTaskIndex = tasks.find((item) => item.uuid === uuid);
+        res.status(204).json('Task deleted successfully')
+    })
+)
 
-    if (foundTaskIndex === -1) {
-      throw HttpErrors.NotFound("Task not found");
-    }
-
-    const filteredTasks = tasks.filter((item) => item.uuid !== uuid);
-
-    fs.writeFileSync(
-      `${global.appRoot}/data/tasks.json`,
-      JSON.stringify(filteredTasks, undefined, 2)
-    );
-
-    res.status(204).json("Task deleted successfully");
-  })
-);
-
-module.exports = router;
+module.exports = router
