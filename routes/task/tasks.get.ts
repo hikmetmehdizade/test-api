@@ -3,7 +3,6 @@ import { Task } from 'prisma/generated';
 import { errorWrap } from '../../helpers/errors';
 import { prisma } from '../../server';
 
-
 const router = require('express').Router();
 
 router.get(

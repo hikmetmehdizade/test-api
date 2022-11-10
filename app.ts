@@ -5,12 +5,12 @@ import express, {
     NextFunction,
 } from 'express';
 
-
 import recursive from 'recursive-readdir';
 import { AppError } from './helpers/errors';
 
-
 const app = express();
+
+app.use(express.json());
 
 app.get('/', (_: Request, res: Response) => {
     res.status(200).json('hello');

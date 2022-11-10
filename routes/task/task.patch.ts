@@ -7,7 +7,6 @@ import validation from '../../helpers/validation';
 import { Task } from '../../prisma/generated';
 import { prisma } from '../../server';
 
-
 router.patch(
     '/task/:uuid',
     validation([

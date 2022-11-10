@@ -1,7 +1,9 @@
-const { validationResult } = require('express-validator');
-const { errorWrap, HttpErrors } = require('./errors');
-const validation = (schema) =>
-    errorWrap(async (req, _, next) => {
+import { NextFunction, Request, Response } from 'express';
+import { validationResult, ValidationChain } from 'express-validator';
+import { errorWrap, HttpErrors } from './errors';
+
+const validation = (schema: ValidationChain[]) =>
+    errorWrap(async (req: Request, _: Response, next: NextFunction) => {
         await Promise.all(schema.map((valid) => valid.run(req)));
         const valRes = validationResult(req);
         if (valRes.isEmpty()) return next();
@@ -16,4 +18,4 @@ const validation = (schema) =>
         throw HttpErrors.BadRequest(errorMessages);
     });
 
-module.exports = validation;
+export default validation;

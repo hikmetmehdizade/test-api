@@ -2,12 +2,12 @@ import { ExpressType } from '../types/express';
 
 type ErrorWrapType = (func: any) => ExpressType;
 
-const errorWrap: ErrorWrapType = (func) => async (req, res, next) =>  func(req, res, next).catch(next);
-
+const errorWrap: ErrorWrapType = (func) => async (req, res, next) =>
+    func(req, res, next).catch(next);
 
 interface ErrorProps {
     message: string;
-    statusCode: number
+    statusCode: number;
 }
 
 class AppError extends Error {
