@@ -26,11 +26,7 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      - DB_PASSWORD=postgres
-      - DB_USERNAME=postgres
-      - DB_NAME=jesttest
-      - DB_HOST=test-db
-      - DB_PORT=5432
+      - DATABASE_URL=postgresql://postgres:postgres@test-db:5432/jesttest
     command: npm run dev
     ports:
       - '4000:4000'

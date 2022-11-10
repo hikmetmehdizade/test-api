@@ -4,10 +4,10 @@ WORKDIR /usr/src
 
 COPY package*.json ./
 
-RUN npm install -g nodemon && npm install
+RUN npm install -g nodemon prisma typescript ts-node && npm install
 
 COPY . .
 
 EXPOSE 4000
 
-CMD ["nodemon", "server.js"]
+CMD ["ts-node", "server.ts"]
