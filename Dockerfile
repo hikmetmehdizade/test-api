@@ -4,7 +4,7 @@ WORKDIR /usr/src
 
 COPY package*.json ./
 
-RUN npm install -g nodemon prisma typescript ts-node && npm install
+RUN npm install -g nodemon prisma copyfiles typescript ts-node && npm install
 
 COPY . .
 

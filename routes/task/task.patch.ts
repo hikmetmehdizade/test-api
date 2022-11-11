@@ -1,11 +1,12 @@
-import { Request, Response } from 'express';
+import { Request, Response, Router } from 'express';
 
-const router = require('express').Router();
-import { errorWrap, HttpErrors } from '../../helpers/errors';
+import { errorWrap } from '../../helpers/errors';
 import { body, param } from 'express-validator';
 import validation from '../../helpers/validation';
 import { Task } from '../../prisma/generated';
-import { prisma } from '../../server';
+import { prisma } from '../../app';
+
+const router = Router();
 
 router.patch(
     '/task/:uuid',
@@ -35,4 +36,4 @@ router.patch(
     )
 );
 
-module.exports = router;
+export default router;

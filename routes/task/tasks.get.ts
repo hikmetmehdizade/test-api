@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
-import { Task } from 'prisma/generated';
+import { Request, Response, Router } from 'express';
+import { Task } from '../../prisma/generated';
 import { errorWrap } from '../../helpers/errors';
-import { prisma } from '../../server';
+import { prisma } from '../../app';
 
-const router = require('express').Router();
+const router = Router();
 
 router.get(
     '/tasks',
@@ -14,4 +14,4 @@ router.get(
     })
 );
 
-module.exports = router;
+export default router;

@@ -1,9 +1,11 @@
-const router = require('express').Router();
+import { Router } from 'express';
 import { Request, Response } from 'express';
 import { param } from 'express-validator';
 import { errorWrap, HttpErrors } from '../../helpers/errors';
 import validation from '../../helpers/validation';
-import { prisma } from '../../server';
+import { prisma } from '../../app';
+
+const router = Router();
 
 router.delete(
     '/task/:uuid',
@@ -21,4 +23,4 @@ router.delete(
     })
 );
 
-module.exports = router;
+export default router;

@@ -1,11 +1,11 @@
-const router = require('express').Router();
 import { errorWrap } from '../../helpers/errors';
 import { body } from 'express-validator';
 import validation from '../../helpers/validation';
-import { Request, Response } from 'express';
-import { Task } from 'prisma/generated';
-import { prisma } from '../../server';
+import { Request, Response, Router } from 'express';
+import { Task } from '../../prisma/generated';
+import { prisma } from '../../app';
 
+const router = Router();
 router.post(
     '/task',
     validation([
@@ -18,11 +18,14 @@ router.post(
             res: Response
         ) => {
             const { title, isDone } = req.body;
+            const { email } = res.locals;
 
-            const task = await prisma.task.create({ data: { title, isDone } });
+            const task = await prisma.task.create({
+                data: { title, isDone, createdBy: { connect: { email } } },
+            });
             res.status(201).json(task);
         }
     )
 );
 
-module.exports = router;
+export default router;

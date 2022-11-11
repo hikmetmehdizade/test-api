@@ -1,10 +1,10 @@
 import { param } from 'express-validator';
 import { errorWrap, HttpErrors } from '../../helpers/errors';
 import validation from '../../helpers/validation';
-const router = require('express').Router();
-import { prisma } from '../../server';
-import { Request, Response } from 'express';
+import { prisma } from '../../app';
+import { Request, Response, Router } from 'express';
 
+const router = Router();
 router.get(
     '/task/:uuid',
     validation([param('uuid').isUUID(4)]),
@@ -21,4 +21,4 @@ router.get(
     })
 );
 
-module.exports = router;
+export default router;

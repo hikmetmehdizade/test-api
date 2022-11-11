@@ -5,3 +5,4 @@ prisma/generated/
 .gitignore
 .env
 .git
+run.sh
