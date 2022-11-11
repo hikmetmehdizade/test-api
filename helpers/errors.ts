@@ -21,6 +21,10 @@ class AppError extends Error {
 
 const HttpErrors = {
   BadRequest: (message = 'Bad Request') =>
+    new AppError({ message, statusCode: 400 }),
+  Unauthorized: (message = 'Unauthorized') =>
+    new AppError({ message, statusCode: 401 }),
+  Forbidden: (message = 'Forbidden') =>
     new AppError({ message, statusCode: 403 }),
   NotFound: (message = 'Not Found') =>
     new AppError({ message, statusCode: 404 }),

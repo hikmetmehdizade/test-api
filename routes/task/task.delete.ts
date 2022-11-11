@@ -4,11 +4,13 @@ import { param } from 'express-validator';
 import { errorWrap, HttpErrors } from '../../helpers/errors';
 import validation from '../../helpers/validation';
 import { prisma } from '../../app';
+import { authMiddleware } from '../../middleware/authMiddleware';
 
 const router = Router();
 
 router.delete(
   '/task/:uuid',
+  authMiddleware,
   validation([param('uuid').isUUID(4)]),
   errorWrap(async (req: Request<{ uuid: string }>, res: Response) => {
     const { uuid } = req.params;

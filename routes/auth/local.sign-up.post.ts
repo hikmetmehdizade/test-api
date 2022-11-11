@@ -1,9 +1,9 @@
-import { Request, Response, Router } from 'express';
-import { errorWrap } from '../../helpers/errors';
+import { NextFunction, Request, Response, Router } from 'express';
+import { errorWrap, HttpErrors } from '../../helpers/errors';
 import { User, UserIdentity } from '../../prisma/generated';
 import { prisma } from '../../app';
 import * as jwt from 'jsonwebtoken';
-import { JWT_SECRET_KEY } from '../../const';
+import { AuthCookies, JWT_SECRET_KEY } from '../../const';
 import { generateTokens } from '../../helpers/token';
 
 const router = Router();
@@ -14,26 +14,41 @@ interface UserSignUpInput
 
 router.post(
   '/auth/local/sign-up',
-  errorWrap(async (req: Request<any, any, UserSignUpInput>, res: Response) => {
-    const { email, password, firstName, lastName } = req.body;
+  errorWrap(
+    async (
+      req: Request<any, any, UserSignUpInput>,
+      res: Response,
+      next: NextFunction
+    ) => {
+      const { email, password, firstName, lastName } = req.body;
 
-    const signPassword = await jwt.sign(password, JWT_SECRET_KEY);
+      const userCount = await prisma.user.count({ where: { email } });
 
-    const { accessToken, refreshToken } = generateTokens(email);
+      if (userCount !== 0) {
+        throw HttpErrors.Forbidden('User with email exists');
+      }
 
-    const [user] = await Promise.all([
-      prisma.user.create({ data: { email, firstName, lastName } }),
-      prisma.userIdentity.create({
-        data: { email, password: signPassword, refreshToken },
-      }),
-    ]);
+      const signPassword = await jwt.sign(password, JWT_SECRET_KEY);
 
-    return res.status(201).json({
-      user,
-      accessToken,
-      refreshToken,
-    });
-  })
+      const { accessToken, refreshToken } = generateTokens(email);
+
+      const [user] = await prisma.$transaction([
+        prisma.user.create({ data: { email, firstName, lastName } }),
+        prisma.userIdentity.create({
+          data: { email, password: signPassword, refreshToken },
+        }),
+      ]);
+
+      res
+        .status(200)
+        .cookie(AuthCookies.ACCESS_TOKEN, accessToken)
+        .cookie(AuthCookies.REFRESH_TOKEN, refreshToken)
+        .json({
+          user,
+        });
+      next();
+    }
+  )
 );
 
 export default router;

@@ -5,11 +5,13 @@ import { body, param } from 'express-validator';
 import validation from '../../helpers/validation';
 import { Task } from '../../prisma/generated';
 import { prisma } from '../../app';
+import { authMiddleware } from '../../middleware/authMiddleware';
 
 const router = Router();
 
 router.patch(
   '/task/:uuid',
+  authMiddleware,
   validation([
     param('uuid').isUUID(4).notEmpty(),
     body('isDone').isBoolean().optional(),

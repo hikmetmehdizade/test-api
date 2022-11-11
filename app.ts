@@ -26,7 +26,7 @@ recursive(`${__dirname}/routes`, [], (err, files) => {
   (async (f: string[]) => {
     for (let i = 0; i < f.length; ++i) {
       const route: Router = (await import(f[i])).default;
-      app.use('/', (req, res, next) => route(req, res, next));
+      app.use('/v1', (req, res, next) => route(req, res, next));
     }
   })(files);
 });

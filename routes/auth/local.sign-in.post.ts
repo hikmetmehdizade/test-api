@@ -1,7 +1,8 @@
-import { Request, Response, Router } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import { generateTokens, verifyPassword } from '../../helpers/token';
 import { errorWrap, HttpErrors } from '../../helpers/errors';
 import { prisma } from '../../app';
+import { AuthCookies } from '../../const';
 
 const router = Router();
 
@@ -10,7 +11,8 @@ router.post(
   errorWrap(
     async (
       req: Request<any, any, { email: string; password: string }>,
-      res: Response
+      res: Response,
+      next: NextFunction
     ) => {
       const { email, password } = req.body;
 
@@ -35,11 +37,14 @@ router.post(
         }),
       ]);
 
-      res.status(200).json({
-        user,
-        accessToken,
-        refreshToken,
-      });
+      res
+        .status(200)
+        .cookie(AuthCookies.ACCESS_TOKEN, accessToken)
+        .cookie(AuthCookies.REFRESH_TOKEN, refreshToken)
+        .json({
+          user,
+        });
+      next();
     }
   )
 );
