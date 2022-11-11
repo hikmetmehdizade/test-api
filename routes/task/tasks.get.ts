@@ -6,12 +6,12 @@ import { prisma } from '../../app';
 const router = Router();
 
 router.get(
-    '/tasks',
-    errorWrap(async (_: Request, res: Response<Task[]>) => {
-        const tasks = await prisma.task.findMany();
+  '/tasks',
+  errorWrap(async (_: Request, res: Response<Task[]>) => {
+    const tasks = await prisma.task.findMany();
 
-        res.status(200).json(tasks);
-    })
+    res.status(200).json(tasks);
+  })
 );
 
 export default router;

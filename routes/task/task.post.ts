@@ -7,25 +7,25 @@ import { prisma } from '../../app';
 
 const router = Router();
 router.post(
-    '/task',
-    validation([
-        body('title').isString().isLength({ min: 3 }).notEmpty(),
-        body('isDone').isBoolean().optional(),
-    ]),
-    errorWrap(
-        async (
-            req: Request<{}, Task, Pick<Task, 'isDone' | 'title'>>,
-            res: Response
-        ) => {
-            const { title, isDone } = req.body;
-            const { email } = res.locals;
+  '/task',
+  validation([
+    body('title').isString().isLength({ min: 3 }).notEmpty(),
+    body('isDone').isBoolean().optional(),
+  ]),
+  errorWrap(
+    async (
+      req: Request<{}, Task, Pick<Task, 'isDone' | 'title'>>,
+      res: Response
+    ) => {
+      const { title, isDone } = req.body;
+      const { email } = res.locals;
 
-            const task = await prisma.task.create({
-                data: { title, isDone, createdBy: { connect: { email } } },
-            });
-            res.status(201).json(task);
-        }
-    )
+      const task = await prisma.task.create({
+        data: { title, isDone, createdBy: { connect: { email } } },
+      });
+      res.status(201).json(task);
+    }
+  )
 );
 
 export default router;

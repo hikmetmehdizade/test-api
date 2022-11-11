@@ -6,19 +6,19 @@ import { Request, Response, Router } from 'express';
 
 const router = Router();
 router.get(
-    '/task/:uuid',
-    validation([param('uuid').isUUID(4)]),
-    errorWrap(async (req: Request<{ uuid: string }>, res: Response) => {
-        const { uuid } = req.params;
+  '/task/:uuid',
+  validation([param('uuid').isUUID(4)]),
+  errorWrap(async (req: Request<{ uuid: string }>, res: Response) => {
+    const { uuid } = req.params;
 
-        const task = await prisma.task.findFirst({ where: { uuid } });
+    const task = await prisma.task.findFirst({ where: { uuid } });
 
-        if (!task) {
-            throw HttpErrors.NotFound('Task not found');
-        }
+    if (!task) {
+      throw HttpErrors.NotFound('Task not found');
+    }
 
-        res.status(200).json(task);
-    })
+    res.status(200).json(task);
+  })
 );
 
 export default router;

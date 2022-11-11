@@ -4,11 +4,8 @@ import { errorWrap } from '../../helpers/errors';
 const router = Router();
 
 router.get(
-    '/me',
-    errorWrap(async (req: Request, res: Response, next: NextFunction) => {
-
-    })
+  '/me',
+  errorWrap(async (req: Request, res: Response, next: NextFunction) => {})
 );
-
 
 export default router;

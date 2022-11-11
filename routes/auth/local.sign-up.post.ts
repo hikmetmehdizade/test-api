@@ -15,7 +15,6 @@ interface UserSignUpInput
 router.post(
   '/auth/local/sign-up',
   errorWrap(async (req: Request<any, any, UserSignUpInput>, res: Response) => {
-
     const { email, password, firstName, lastName } = req.body;
 
     const signPassword = await jwt.sign(password, JWT_SECRET_KEY);
@@ -29,7 +28,7 @@ router.post(
       }),
     ]);
 
-   return  res.status(201).json({
+    return res.status(201).json({
       user,
       accessToken,
       refreshToken,
