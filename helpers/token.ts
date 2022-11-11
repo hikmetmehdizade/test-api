@@ -3,13 +3,14 @@ import { JWT_SECRET_KEY } from '../const';
 
 interface TokenPayload extends JwtPayload {
   email: string;
+  workspaceId?: string;
 }
 
-const generateTokens = (email: string) => {
-  const accessToken = jwt.sign({ email }, JWT_SECRET_KEY, {
+const generateTokens = (email: string, workspaceId?: string) => {
+  const accessToken = jwt.sign({ email, workspaceId }, JWT_SECRET_KEY, {
     expiresIn: '15m',
   });
-  const refreshToken = jwt.sign({ email }, JWT_SECRET_KEY, {
+  const refreshToken = jwt.sign({ email, workspaceId }, JWT_SECRET_KEY, {
     expiresIn: '30 days',
   });
 

@@ -21,9 +21,8 @@ router.post(
     ) => {
       const { title, isDone } = req.body;
       const { email } = res.locals.user;
-
       const task = await prisma.task.create({
-        data: { title, isDone, createdBy: { connect: { email } } },
+        data: { title, isDone, statusId: 'ssss', workspaceId: 'ssss' },
       });
       res.status(201).json(task);
     }

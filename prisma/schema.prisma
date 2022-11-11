@@ -11,26 +11,78 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum WorkspaceMemberRole {
+  OWNER
+  ADMIN
+  USER
+}
+
+enum TaskRole {
+  CREATOR
+  OBSERVER
+  EXECUTOR
+}
+
+model Workspace {
+  uuid         String                @id @default(uuid())
+  name         String
+  createdAt    DateTime              @default(now()) @map("created_at")
+  updatedAt    DateTime              @updatedAt @map("updated_at")
+  members      WorkspaceMember[]
+  tasks        Task[]
+  taskStatuses WorkspaceTaskStatus[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  uuid        String              @id @default(uuid())
+  user        User                @relation(fields: [userId], references: [uuid], onDelete: Cascade)
+  userId      String              @map("user_id")
+  workspace   Workspace           @relation(fields: [workspaceId], references: [uuid], onDelete: Cascade)
+  workspaceId String              @map("workspace_id")
+  role        WorkspaceMemberRole @default(USER)
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+  tasks       AssignedMember[]
+
+  @@map("workspace_members")
+}
+
 model Task {
-  uuid        String   @id @default(uuid())
-  title       String   @db.VarChar(255)
-  isDone      Boolean  @default(false) @map("is_done")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  createdBy   User     @relation(fields: [createdById], references: [uuid])
-  createdById String   @map("created_by_id")
+  uuid            String              @id @default(uuid())
+  title           String              @db.VarChar(255)
+  isDone          Boolean             @default(false) @map("is_done")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+  workspace       Workspace           @relation(fields: [workspaceId], references: [uuid], onDelete: Cascade)
+  workspaceId     String              @map("worksapce_id")
+  assignedMembers AssignedMember[]
+  status          WorkspaceTaskStatus @relation(fields: [statusId], references: [uuid])
+  statusId        String
 
   @@map("tasks")
 }
 
+model AssignedMember {
+  memberId String          @map("member_id")
+  member   WorkspaceMember @relation(fields: [memberId], references: [uuid], onDelete: Cascade)
+  taskId   String          @map("task_id")
+  task     Task            @relation(fields: [taskId], references: [uuid], onDelete: Cascade)
+  role     TaskRole        @default(EXECUTOR)
+
+  @@id([memberId, taskId])
+  @@map("assigned_members")
+}
+
 model User {
-  uuid      String   @id @default(uuid())
-  email     String   @unique
-  firstName String   @map("first_name")
-  lastName  String   @map("last_name")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  tasks     Task[]
+  uuid                   String            @id @default(uuid())
+  email                  String            @unique
+  firstName              String            @map("first_name")
+  lastName               String            @map("last_name")
+  createdAt              DateTime          @default(now()) @map("created_at")
+  updatedAt              DateTime          @updatedAt @map("updated_at")
+  workspaceParticipation WorkspaceMember[]
 
   @@map("users")
 }
@@ -42,4 +94,17 @@ model UserIdentity {
   refreshToken String?
 
   @@map("users_identity")
+}
+
+model WorkspaceTaskStatus {
+  uuid        String    @id @default(uuid())
+  title       String
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  workspace   Workspace @relation(fields: [workspaceId], references: [uuid], onDelete: Cascade)
+  workspaceId String    @map("workspace_id")
+  tasks       Task[]
+  order       Int       @default(1)
+
+  @@map("worksapce_task_statuses")
 }

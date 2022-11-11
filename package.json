@@ -6,8 +6,8 @@
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "start:prod": "node ./dist/server.js",
-    "start:dev": "ts-node server.ts",
-    "dev": "npm run prisma:migrate && npm run prisma:generate  && ts-node server.ts",
+    "start:dev": "nodemon --watch \"./**/*.ts\" --exec ts-node server.ts",
+    "dev": "npm run prisma:migrate && npm run prisma:generate  && npm run start:dev",
     "prisma:copy": "copyfiles -u 1 ./prisma/schema.prisma ./dist/prisma/generated/",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:generate": "prisma generate --schema ./prisma/schema.prisma",
