@@ -1,8 +1,10 @@
 declare global {
   namespace Express {
     interface Response {
-      locals: string;
+      locals: {
+        user: import('./prisma/generated').User;
+        workspaceId: string;
+      };
     }
   }
 }
-

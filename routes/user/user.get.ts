@@ -6,7 +6,7 @@ const router = Router();
 
 router.get(
   '/me',
-  authMiddleware,
+  authMiddleware([]),
   errorWrap(async (_: Request, res: Response) => {
     const { user } = res.locals;
     res.status(200).json({ user });

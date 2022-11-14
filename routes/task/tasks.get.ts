@@ -8,7 +8,7 @@ const router = Router();
 
 router.get(
   '/tasks',
-  authMiddleware,
+  authMiddleware([]),
   errorWrap(async (req: Request, res: Response) => {
     const { uuid } = res.locals.user;
 

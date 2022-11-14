@@ -1,13 +1,13 @@
 import { authMiddleware } from '../../middleware/authMiddleware';
 import { Router, Request, Response } from 'express';
-import { errorWrap } from 'helpers/errors';
+import { errorWrap } from '../../helpers/errors';
 import { prisma } from '../../app';
 
 const router = Router();
 
 router.post(
   '/workspace',
-  authMiddleware,
+  authMiddleware([]),
   errorWrap(async (req: Request, res: Response) => {
     const { user } = res.locals;
     const { name } = req.body;

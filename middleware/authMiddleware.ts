@@ -3,10 +3,13 @@ import { errorWrap, HttpErrors } from '../helpers/errors';
 import { AuthCookies } from '../const';
 import { generateTokens, verifyToken } from '../helpers/token';
 import { prisma } from '../app';
+import { WorkspaceMemberRole } from '../prisma/generated';
+import { ensureWorkspaceMemberRole } from '../helpers/roles';
+
 type AuthTokensType = string | undefined;
 
-export const authMiddleware = errorWrap(
-  async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = (roles: WorkspaceMemberRole[]) =>
+  errorWrap(async (req: Request, res: Response, next: NextFunction) => {
     const cookieAccessToken: AuthTokensType =
       req.cookies[AuthCookies.ACCESS_TOKEN];
     const cookieRefreshToken: AuthTokensType =
@@ -20,6 +23,14 @@ export const authMiddleware = errorWrap(
         where: { email: verifiedAccess.email },
       });
 
+      if (roles.length > 0) {
+        await ensureWorkspaceMemberRole(
+          roles,
+          user.uuid,
+          verifiedAccess.workspaceId
+        );
+      }
+      res.locals.workspaceId = verifiedAccess?.workspaceId;
       res.locals.user = user;
       next();
       return;
@@ -29,6 +40,14 @@ export const authMiddleware = errorWrap(
       const user = await prisma.user.findUniqueOrThrow({
         where: { email: verifiedRefresh.email },
       });
+
+      if (roles.length > 0) {
+        await ensureWorkspaceMemberRole(
+          roles,
+          user.uuid,
+          verifiedRefresh.workspaceId
+        );
+      }
 
       const { accessToken, refreshToken } = generateTokens(user.email);
       await prisma.userIdentity.update({
@@ -48,5 +67,4 @@ export const authMiddleware = errorWrap(
         .clearCookie(AuthCookies.REFRESH_TOKEN);
       throw HttpErrors.Unauthorized();
     }
-  }
-);
+  });

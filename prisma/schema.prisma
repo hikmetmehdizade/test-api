@@ -59,7 +59,7 @@ model Task {
   workspaceId     String              @map("worksapce_id")
   assignedMembers AssignedMember[]
   status          WorkspaceTaskStatus @relation(fields: [statusId], references: [uuid])
-  statusId        String
+  statusId        String              @map("status_id")
 
   @@map("tasks")
 }
@@ -91,7 +91,7 @@ model UserIdentity {
   uuid         String  @id @default(uuid())
   email        String  @unique
   password     String
-  refreshToken String?
+  refreshToken String? @map("refresh_token")
 
   @@map("users_identity")
 }
@@ -106,5 +106,5 @@ model WorkspaceTaskStatus {
   tasks       Task[]
   order       Int       @default(1)
 
-  @@map("worksapce_task_statuses")
+  @@map("workspace_task_statuses")
 }

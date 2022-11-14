@@ -10,7 +10,7 @@ const router = Router();
 
 router.delete(
   '/task/:uuid',
-  authMiddleware,
+  authMiddleware([]),
   validation([param('uuid').isUUID(4)]),
   errorWrap(async (req: Request<{ uuid: string }>, res: Response) => {
     const { uuid } = req.params;

@@ -11,7 +11,7 @@ const router = Router();
 
 router.patch(
   '/task/:uuid',
-  authMiddleware,
+  authMiddleware([]),
   validation([
     param('uuid').isUUID(4).notEmpty(),
     body('isDone').isBoolean().optional(),

@@ -9,7 +9,7 @@ import { authMiddleware } from '../../middleware/authMiddleware';
 const router = Router();
 router.post(
   '/task',
-  authMiddleware,
+  authMiddleware([]),
   validation([
     body('title').isString().isLength({ min: 3 }).notEmpty(),
     body('isDone').isBoolean().optional(),

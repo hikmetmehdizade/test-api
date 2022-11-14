@@ -8,7 +8,7 @@ import { authMiddleware } from '../../middleware/authMiddleware';
 const router = Router();
 router.get(
   '/task/:uuid',
-  authMiddleware,
+  authMiddleware([]),
   validation([param('uuid').isUUID(4)]),
   errorWrap(async (req: Request<{ uuid: string }>, res: Response) => {
     const { uuid } = req.params;
