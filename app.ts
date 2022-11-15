@@ -6,6 +6,7 @@ import express, {
   Router,
 } from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 import recursive from 'recursive-readdir';
 import { AppError } from './helpers/errors';
@@ -14,9 +15,15 @@ import { PrismaClient } from './prisma/generated';
 const prisma = new PrismaClient();
 
 const app = express();
-
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+    optionsSuccessStatus: 200,
+  })
+);
 
 app.get('/', (_: Request, res: Response) => {
   res.status(200).json('hello');

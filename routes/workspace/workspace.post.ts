@@ -36,3 +36,5 @@ router.post(
     res.status(201).json(workspace);
   })
 );
+
+export default router;

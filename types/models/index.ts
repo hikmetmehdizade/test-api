@@ -4,7 +4,7 @@ import {
   Workspace as BaseWorkspace,
   WorkspaceMember as BaseWorkspaceMember,
   WorkspaceTaskStatus as BaseWorkspaceTaskStatus,
-  AssignedMember as BaseAssignedMember
+  AssignedMember as BaseAssignedMember,
 } from '../../prisma/generated';
 
 export interface User extends BaseUser {
@@ -25,10 +25,8 @@ export interface Task extends BaseTask {
 }
 
 export interface WorkspaceTaskStatus extends BaseWorkspaceTaskStatus {
-    workspace: Workspace;
-    tasks: Task[]
+  workspace: Workspace;
+  tasks: Task[];
 }
 
-export interface AssignedMember extends BaseAssignedMember {
-
-}
+export interface AssignedMember extends BaseAssignedMember {}
