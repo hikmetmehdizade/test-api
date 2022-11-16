@@ -1,4 +1,4 @@
-import { errorWrap } from '../../helpers/errors';
+import { errorWrap, HttpErrors } from '../../helpers/errors';
 import { body } from 'express-validator';
 import validation from '../../helpers/validation';
 import { Request, Response, Router } from 'express';
@@ -15,14 +15,54 @@ router.post(
     body('isDone').isBoolean().optional(),
   ]),
   errorWrap(
-    async (
-      req: Request<{}, Task, Pick<Task, 'isDone' | 'title'>>,
-      res: Response
-    ) => {
-      const { title, isDone } = req.body;
-      const { email } = res.locals.user;
+    async (req: Request<{}, Task, Pick<Task, 'title'>>, res: Response) => {
+      const { title } = req.body;
+      const { user, workspaceId } = res.locals;
+
+      const statuses = await prisma.workspaceTaskStatus.findMany({
+        where: {
+          workspaceId,
+        },
+        orderBy: {
+          order: 'asc',
+        },
+      });
+
+      const member = await prisma.workspaceMember.findFirst({
+        where: {
+          userId: user.uuid,
+          workspaceId,
+        },
+      });
+      if (!member) {
+        throw HttpErrors.NotFound('Workspace member not found');
+      }
       const task = await prisma.task.create({
-        data: { title, isDone, statusId: 'ssss', workspaceId: 'ssss' },
+        data: {
+          title,
+          status: {
+            connect: {
+              uuid: 'sdsadsada',
+            },
+          },
+          workspace: {
+            connect: {
+              uuid: workspaceId,
+            },
+          },
+          assignedMembers: {
+            create: [
+              {
+                role: 'CREATOR',
+                member: {
+                  connect: {
+                    uuid: member.uuid,
+                  },
+                },
+              },
+            ],
+          },
+        },
       });
       res.status(201).json(task);
     }

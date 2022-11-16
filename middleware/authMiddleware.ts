@@ -18,9 +18,11 @@ export const authMiddleware = (roles: WorkspaceMemberRole[]) =>
     const verifiedRefresh = verifyToken(cookieRefreshToken);
 
     if (typeof verifiedAccess !== 'undefined') {
-      verifiedAccess.email;
       const user = await prisma.user.findUniqueOrThrow({
         where: { email: verifiedAccess.email },
+        include: {
+          currentWorkspace: true,
+        },
       });
 
       if (roles.length > 0) {
@@ -30,7 +32,7 @@ export const authMiddleware = (roles: WorkspaceMemberRole[]) =>
           verifiedAccess.workspaceId
         );
       }
-      res.locals.workspaceId = verifiedAccess?.workspaceId;
+      res.locals.workspaceId = user.currentWorkspace?.uuid;
       res.locals.user = user;
       next();
       return;
@@ -39,6 +41,9 @@ export const authMiddleware = (roles: WorkspaceMemberRole[]) =>
     if (typeof verifiedRefresh !== 'undefined') {
       const user = await prisma.user.findUniqueOrThrow({
         where: { email: verifiedRefresh.email },
+        include: {
+          currentWorkspace: true,
+        },
       });
 
       if (roles.length > 0) {
@@ -49,16 +54,20 @@ export const authMiddleware = (roles: WorkspaceMemberRole[]) =>
         );
       }
 
-      const { accessToken, refreshToken } = generateTokens(user.email);
+      const { accessToken, refreshToken } = generateTokens(
+        user.email,
+        user.currentWorkspace?.uuid
+      );
       await prisma.userIdentity.update({
         data: { refreshToken },
         where: { email: verifiedRefresh.email },
       });
 
+      res.locals.user = user;
+      res.locals.workspaceId = user.currentWorkspace?.uuid;
       res
         .cookie(AuthCookies.ACCESS_TOKEN, accessToken)
         .cookie(AuthCookies.REFRESH_TOKEN, refreshToken);
-      res.locals.user = user;
       next();
       return;
     } else {

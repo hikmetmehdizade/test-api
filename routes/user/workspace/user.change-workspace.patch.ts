@@ -35,14 +35,28 @@ router.patch(
       workspaceId
     );
 
-    await prisma.userIdentity.update({
-      data: {
-        refreshToken,
-      },
-      where: {
-        email: user.email,
-      },
-    });
+    await prisma.$transaction([
+      prisma.userIdentity.update({
+        data: {
+          refreshToken,
+        },
+        where: {
+          email: user.email,
+        },
+      }),
+      prisma.user.update({
+        data: {
+          currentWorkspace: {
+            connect: {
+              uuid: workspaceId,
+            },
+          },
+        },
+        where: {
+          uuid: user.uuid,
+        },
+      }),
+    ]);
 
     res
       .status(200)

@@ -31,6 +31,7 @@ model Workspace {
   members      WorkspaceMember[]
   tasks        Task[]
   taskStatuses WorkspaceTaskStatus[]
+  User         User[]
 
   @@map("workspaces")
 }
@@ -52,7 +53,6 @@ model WorkspaceMember {
 model Task {
   uuid            String              @id @default(uuid())
   title           String              @db.VarChar(255)
-  isDone          Boolean             @default(false) @map("is_done")
   createdAt       DateTime            @default(now()) @map("created_at")
   updatedAt       DateTime            @updatedAt @map("updated_at")
   workspace       Workspace           @relation(fields: [workspaceId], references: [uuid], onDelete: Cascade)
@@ -83,6 +83,8 @@ model User {
   createdAt              DateTime          @default(now()) @map("created_at")
   updatedAt              DateTime          @updatedAt @map("updated_at")
   workspaceParticipation WorkspaceMember[]
+  currentWorkspace       Workspace?        @relation(fields: [currentWorkspaceId], references: [uuid])
+  currentWorkspaceId     String?           @map("current_workspace_id")
 
   @@map("users")
 }

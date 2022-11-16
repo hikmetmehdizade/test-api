@@ -14,12 +14,11 @@ router.patch(
   authMiddleware([]),
   validation([
     param('uuid').isUUID(4).notEmpty(),
-    body('isDone').isBoolean().optional(),
     body('title').isString().isLength({ min: 3 }).optional(),
   ]),
   errorWrap(
     async (
-      req: Request<{ uuid: string }, Task, { isDone: boolean; title: string }>,
+      req: Request<{ uuid: string }, Task, { title: string }>,
       res: Response<Task>
     ) => {
       const { uuid } = req.params;

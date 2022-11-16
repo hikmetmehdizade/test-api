@@ -10,9 +10,15 @@ router.get(
   '/tasks',
   authMiddleware([]),
   errorWrap(async (req: Request, res: Response) => {
-    const { uuid } = res.locals.user;
+    const { workspaceId } = res.locals;
 
-    const tasks = await prisma.task.findMany();
+    const tasks = await prisma.task.findMany({
+      where: {
+        workspace: {
+          uuid: workspaceId,
+        },
+      },
+    });
 
     res.status(200).json(tasks);
   })
