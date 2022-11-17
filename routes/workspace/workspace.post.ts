@@ -1,6 +1,6 @@
 import { authMiddleware } from '../../middleware/authMiddleware';
 import { Router, Request, Response } from 'express';
-import { errorWrap } from '../../helpers/errors';
+import { errorWrap, HttpErrors } from '../../helpers/errors';
 import { prisma } from '../../app';
 
 const router = Router();
@@ -11,6 +11,26 @@ router.post(
   errorWrap(async (req: Request, res: Response) => {
     const { user } = res.locals;
     const { name } = req.body;
+
+    const count = await prisma.workspace.count({
+      where: {
+        name: {
+          equals: name,
+        },
+        members: {
+          some: {
+            role: 'OWNER',
+            user: {
+              uuid: user.uuid,
+            },
+          },
+        },
+      },
+    });
+
+    if (count > 0) {
+      throw HttpErrors.BadRequest('A workspace with this name already exists');
+    }
 
     const workspace = await prisma.workspace.create({
       data: {
@@ -33,7 +53,7 @@ router.post(
       },
     });
 
-    res.status(201).json(workspace);
+    res.status(201).json({ workspace });
   })
 );
 

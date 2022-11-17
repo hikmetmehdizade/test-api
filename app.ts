@@ -47,7 +47,7 @@ app.use(
   ) => {
     console.log(err);
     if (err instanceof AppError) {
-      return res.status(err.statusCode).json(err);
+      return res.status(err.statusCode).json({ message: err.message });
     }
     res.status(500).json(err);
     next();

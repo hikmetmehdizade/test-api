@@ -7,12 +7,12 @@ import { AuthCookies } from '../../../const';
 
 const router = Router();
 
-router.patch(
+router.post(
   '/user/workspace/:workspaceId',
   authMiddleware([]),
   errorWrap(async (req: Request<{ workspaceId: string }>, res: Response) => {
     const { workspaceId } = req.params;
-    const { user } = res.locals.user;
+    const { user } = res.locals;
     const count = await prisma.workspace.count({
       where: {
         uuid: workspaceId,

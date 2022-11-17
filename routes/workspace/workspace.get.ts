@@ -10,15 +10,23 @@ router.get(
   authMiddleware([]),
   errorWrap(async (req: Request<{ workspaceId: string }>, res: Response) => {
     const { workspaceId } = req.params;
+    const { user } = res.locals;
 
-    const workspace = await prisma.workspace.findUnique({
+    const workspace = await prisma.workspace.findFirst({
       where: {
         uuid: workspaceId,
+        members: {
+          some: {
+            user: {
+              uuid: user.uuid,
+            },
+          },
+        },
       },
     });
 
     if (!workspace) {
-      throw HttpErrors.NotFound('Workspace not found');
+      throw HttpErrors.NotFound('Workspace not fo und');
     }
 
     res.status(200).json({
